@@ -16,7 +16,7 @@ body{
     overflow:hidden;
 }
 
-/* JEDEN GŁÓWNY BOX */
+/* GŁÓWNY BOX */
 .container{
     width:750px;
     height:520px;
@@ -28,14 +28,11 @@ body{
     position:relative;
     overflow:hidden;
     box-shadow:0 20px 40px rgba(0,0,0,0.25);
+    z-index:2;
 }
 
-h1{
-    color:#c2185b;
-    margin-bottom:30px;
-}
+h1{color:#c2185b;margin-bottom:30px;}
 
-/* OBSZAR PRZYCISKÓW – BEZ OBRAMÓWKI */
 .buttons{
     width:360px;
     height:220px;
@@ -43,7 +40,6 @@ h1{
     position:relative;
 }
 
-/* PRZYCISKI */
 button{
     position:absolute;
     padding:12px 26px;
@@ -52,6 +48,7 @@ button{
     border-radius:30px;
     cursor:pointer;
     white-space:nowrap;
+    z-index:3;
 }
 
 #yes{
@@ -69,10 +66,11 @@ button{
     transform:translateX(-50%);
 }
 
-/* BOX PO TAK */
 .love-box{
     display:none;
     margin-top:10px;
+    position:relative;
+    z-index:3;
 }
 
 .love-box h2{
@@ -90,7 +88,22 @@ button{
     position:absolute;
     width:120px;
     pointer-events:none;
-    z-index:1;
+    z-index:1; /* ZA TEKSTEM */
+}
+
+/* SERDUSZKA */
+.heart{
+    position:fixed;
+    top:-30px;
+    font-size:24px;
+    animation:fall linear infinite;
+    opacity:0.85;
+    pointer-events:none;
+    z-index:0;
+}
+
+@keyframes fall{
+    to{transform:translateY(110vh);}
 }
 </style>
 </head>
@@ -114,37 +127,48 @@ button{
 </div>
 
 <script>
-const noBtn = document.getElementById("no");
-const box = document.getElementById("buttonsBox");
-const yesBtn = document.getElementById("yes");
-const loveBox = document.getElementById("loveBox");
-const question = document.getElementById("question");
-const container = document.getElementById("container");
+/* SERDUSZKA */
+function createHeart(){
+    const h=document.createElement("div");
+    h.className="heart";
+    h.textContent="❤️";
+    h.style.left=Math.random()*100+"vw";
+    h.style.fontSize=(18+Math.random()*20)+"px";
+    h.style.animationDuration=(4+Math.random()*4)+"s";
+    document.body.appendChild(h);
+    setTimeout(()=>h.remove(),8000);
+}
+setInterval(createHeart,350);
 
-const texts = ["nie","serio?","ej 😳","no weź","💔"];
-let step = 0;
+/* PRZYCISK NIE */
+const noBtn=document.getElementById("no");
+const box=document.getElementById("buttonsBox");
+const texts=["nie","serio?","ej 😳","no weź","💔"];
+let step=0;
 
-/* UCIEKANIE "NIE" – W GRANICACH CONTAINERA */
-noBtn.addEventListener("mouseenter", ()=>{
-    const maxX = box.clientWidth - noBtn.offsetWidth;
-    const maxY = box.clientHeight - noBtn.offsetHeight;
-
-    noBtn.style.left = Math.random()*maxX + "px";
-    noBtn.style.top  = Math.random()*maxY + "px";
-
-    if(step < texts.length-1) step++;
-    noBtn.textContent = texts[step];
+noBtn.addEventListener("mouseenter",()=>{
+    const maxX=box.clientWidth-noBtn.offsetWidth;
+    const maxY=box.clientHeight-noBtn.offsetHeight;
+    noBtn.style.left=Math.random()*maxX+"px";
+    noBtn.style.top=Math.random()*maxY+"px";
+    if(step<texts.length-1) step++;
+    noBtn.textContent=texts[step];
 });
 
-/* KLIK TAK */
-yesBtn.addEventListener("click", ()=>{
+/* TAK */
+const yesBtn=document.getElementById("yes");
+const loveBox=document.getElementById("loveBox");
+const question=document.getElementById("question");
+const container=document.getElementById("container");
+
+yesBtn.addEventListener("click",()=>{
     document.getElementById("buttonsBox").style.display="none";
     question.style.display="none";
     loveBox.style.display="block";
     startFlyingPNG();
 });
 
-/* PNG STARTUJĄ Z BOKÓW STRONY I ODBIJAJĄ SIĘ OD BOXA */
+/* PNG – WLOT Z BOKÓW */
 function startFlyingPNG(){
     const pngs=[];
     const count=4;
@@ -155,14 +179,13 @@ function startFlyingPNG(){
         img.className="flying";
         container.appendChild(img);
 
-        const startLeft = i%2===0 ? -140 : container.clientWidth + 20;
-
+        const fromLeft=i%2===0;
         pngs.push({
             el:img,
-            x:startLeft,
-            y:Math.random()*(container.clientHeight-140),
-            vx:i%2===0 ? 3 : -3,
-            vy:(Math.random()*2+2)*(Math.random()<0.5?-1:1)
+            x:fromLeft?-130:container.clientWidth+10,
+            y:Math.random()*(container.clientHeight-120),
+            vx:fromLeft?3:-3,
+            vy:(Math.random()*2+1.5)*(Math.random()<0.5?-1:1)
         });
     }
 
@@ -171,8 +194,8 @@ function startFlyingPNG(){
             p.x+=p.vx;
             p.y+=p.vy;
 
-            if(p.x<=0 || p.x>=container.clientWidth-120) p.vx*=-1;
-            if(p.y<=0 || p.y>=container.clientHeight-120) p.vy*=-1;
+            if(p.x<=0||p.x>=container.clientWidth-120) p.vx*=-1;
+            if(p.y<=0||p.y>=container.clientHeight-120) p.vy*=-1;
 
             p.el.style.left=p.x+"px";
             p.el.style.top=p.y+"px";
