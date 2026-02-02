@@ -75,7 +75,7 @@ button{
 .love-box h2{color:#e91e63;margin-bottom:15px;}
 .love-box img{max-width:240px;border-radius:20px;}
 
-/* PNG – POWIĘKSZONE DO 180px */
+/* PNG – 180px */
 .flying{
     position:fixed;
     width:180px;
@@ -176,11 +176,13 @@ yesBtn.addEventListener("click",()=>{
     startFlyingPNG();
 });
 
-/* PNG – LATAJĄ PO EKRANIE I ODBIJAJĄ SIĘ OD BOXA */
+/* PNG – START LOSOWO POZA BOXEM, ODBICIE OD BOXA */
 function startFlyingPNG(){
     const pngs=[];
-    const count=4;
-    const size=180; // nowy rozmiar
+    const count=8;
+    const size=180;
+
+    const boxRect=container.getBoundingClientRect();
 
     for(let i=0;i<count;i++){
         const img=document.createElement("img");
@@ -188,10 +190,22 @@ function startFlyingPNG(){
         img.className="flying";
         document.body.appendChild(img);
 
+        // START POZA BOXEM
+        let x, y;
+        do {
+            x=Math.random()*(window.innerWidth-size);
+            y=Math.random()*(window.innerHeight-size);
+        } while (
+            x+size>boxRect.left &&
+            x<boxRect.right &&
+            y+size>boxRect.top &&
+            y<boxRect.bottom
+        );
+
         pngs.push({
             el:img,
-            x:Math.random()*(window.innerWidth-size),
-            y:Math.random()*(window.innerHeight-size),
+            x:x,
+            y:y,
             vx:(Math.random()*3+2)*(Math.random()<0.5?-1:1),
             vy:(Math.random()*3+2)*(Math.random()<0.5?-1:1)
         });
@@ -199,30 +213,37 @@ function startFlyingPNG(){
 
     function animate(){
         const boxRect=container.getBoundingClientRect();
-
         pngs.forEach(p=>{
             p.x+=p.vx;
             p.y+=p.vy;
 
-            /* odbicie od ekranu */
+            // odbicie od ekranu
             if(p.x<=0||p.x>=window.innerWidth-size) p.vx*=-1;
             if(p.y<=0||p.y>=window.innerHeight-size) p.vy*=-1;
 
-            /* kolizja z boxem */
+            // odbicie od boxa
             if(
                 p.x+size>boxRect.left &&
                 p.x<boxRect.right &&
                 p.y+size>boxRect.top &&
                 p.y<boxRect.bottom
             ){
-                p.vx*=-1;
-                p.vy*=-1;
+                // proste odbicie
+                if(p.vx>0 && p.x<boxRect.left) p.vx*=-1;
+                else if(p.vx<0 && p.x+size>boxRect.right) p.vx*=-1;
+                if(p.vy>0 && p.y<boxRect.top) p.vy*=-1;
+                else if(p.vy<0 && p.y+size>boxRect.bottom) p.vy*=-1;
+
+                // minimalny przesuw w bezpieczne miejsce
+                if(p.x+size>boxRect.left && p.x<boxRect.right)
+                    p.x = p.vx>0 ? boxRect.left-size-1 : boxRect.right+1;
+                if(p.y+size>boxRect.top && p.y<boxRect.bottom)
+                    p.y = p.vy>0 ? boxRect.top-size-1 : boxRect.bottom+1;
             }
 
             p.el.style.left=p.x+"px";
             p.el.style.top=p.y+"px";
         });
-
         requestAnimationFrame(animate);
     }
     animate();
