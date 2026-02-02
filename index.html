@@ -48,7 +48,7 @@ button{
     cursor:pointer;
     white-space:nowrap;
     z-index:3;
-    transition: left 0.25s ease, top 0.25s ease;
+    transition:left 0.25s ease, top 0.25s ease;
 }
 
 #yes{
@@ -128,44 +128,39 @@ function createHeart(){
 }
 setInterval(createHeart,350);
 
-/* PRZYCISK NIE – PŁYNNY RUCH + COOLDOWN */
+/* PRZYCISK NIE */
 const noBtn=document.getElementById("no");
 const box=document.getElementById("buttonsBox");
-
 const texts=["nie","serio?","ej 😳","no weź","💔"];
 let textIndex=0;
-let lastTextChange=0;
+let lastChange=0;
 
 noBtn.addEventListener("mousemove",(e)=>{
     const now=Date.now();
-
     const boxRect=box.getBoundingClientRect();
     const btnRect=noBtn.getBoundingClientRect();
 
-    const btnX=btnRect.left+btnRect.width/2;
-    const btnY=btnRect.top+btnRect.height/2;
-
-    const dx=btnX-e.clientX;
-    const dy=btnY-e.clientY;
-    const dist=Math.sqrt(dx*dx+dy*dy);
+    const dx=(btnRect.left+btnRect.width/2)-e.clientX;
+    const dy=(btnRect.top+btnRect.height/2)-e.clientY;
+    const dist=Math.hypot(dx,dy);
 
     if(dist<120){
-        const move=40;
         const angle=Math.atan2(dy,dx);
+        const move=35;
 
-        let newLeft=(btnRect.left-boxRect.left)+Math.cos(angle)*move;
-        let newTop =(btnRect.top -boxRect.top )+Math.sin(angle)*move;
+        let left=(btnRect.left-boxRect.left)+Math.cos(angle)*move;
+        let top =(btnRect.top -boxRect.top )+Math.sin(angle)*move;
 
-        newLeft=Math.max(0,Math.min(box.clientWidth-btnRect.width,newLeft));
-        newTop =Math.max(0,Math.min(box.clientHeight-btnRect.height,newTop));
+        left=Math.max(0,Math.min(box.clientWidth-btnRect.width,left));
+        top =Math.max(0,Math.min(box.clientHeight-btnRect.height,top));
 
-        noBtn.style.left=newLeft+"px";
-        noBtn.style.top =newTop +"px";
+        noBtn.style.left=left+"px";
+        noBtn.style.top =top +"px";
 
-        if(now-lastTextChange>600 && textIndex<texts.length-1){
+        if(now-lastChange>600 && textIndex<texts.length-1){
             textIndex++;
             noBtn.textContent=texts[textIndex];
-            lastTextChange=now;
+            lastChange=now;
         }
     }
 });
@@ -183,30 +178,37 @@ yesBtn.addEventListener("click",()=>{
     startFlyingPNG();
 });
 
-/* PNG */
+/* PNG — STARTUJĄ PRZY KRAWĘDZI (WIDOCZNE) */
 function startFlyingPNG(){
     const pngs=[];
-    for(let i=0;i<4;i++){
+    const count=4;
+    const size=120;
+
+    for(let i=0;i<count;i++){
         const img=document.createElement("img");
         img.src="meme1.png";
         img.className="flying";
         container.appendChild(img);
 
-        const left=i%2===0;
+        const fromLeft=i%2===0;
+
         pngs.push({
             el:img,
-            x:left?-130:container.clientWidth+10,
-            y:Math.random()*(container.clientHeight-120),
-            vx:left?3:-3,
+            x:fromLeft?0:container.clientWidth-size,
+            y:Math.random()*(container.clientHeight-size),
+            vx:fromLeft?3:-3,
             vy:(Math.random()*2+1)*(Math.random()<0.5?-1:1)
         });
     }
 
     function animate(){
         pngs.forEach(p=>{
-            p.x+=p.vx; p.y+=p.vy;
-            if(p.x<=0||p.x>=container.clientWidth-120) p.vx*=-1;
-            if(p.y<=0||p.y>=container.clientHeight-120) p.vy*=-1;
+            p.x+=p.vx;
+            p.y+=p.vy;
+
+            if(p.x<=0||p.x>=container.clientWidth-size) p.vx*=-1;
+            if(p.y<=0||p.y>=container.clientHeight-size) p.vy*=-1;
+
             p.el.style.left=p.x+"px";
             p.el.style.top=p.y+"px";
         });
