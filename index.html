@@ -25,6 +25,7 @@ body {
     padding: 30px;
     box-sizing: border-box;
     text-align: center;
+    position: relative;
 }
 
 /* PYTANIE */
@@ -33,7 +34,7 @@ h1 {
     margin-bottom: 20px;
 }
 
-/* ⬜ ISTNIEJĄCY BOX */
+/* BIAŁY BOX (TEN SAM) */
 .buttons {
     width: 380px;
     height: 230px;
@@ -41,7 +42,7 @@ h1 {
     border-radius: 25px;
     margin: 0 auto;
     position: relative;
-    overflow: hidden; /* NIC NIE WYJDZIE */
+    overflow: hidden;
     box-shadow: 0 10px 25px rgba(0,0,0,0.15);
 }
 
@@ -53,7 +54,7 @@ button {
     border-radius: 30px;
     border: none;
     cursor: pointer;
-    white-space: nowrap; /* 🔥 TEKST NIGDY SIĘ NIE ZŁAMIE */
+    white-space: nowrap;
 }
 
 #yes {
@@ -71,7 +72,7 @@ button {
     transform: translateX(-50%);
 }
 
-/* PO TAK */
+/* BOX PO TAK */
 .love-box {
     display: none;
     background: white;
@@ -80,6 +81,7 @@ button {
     width: fit-content;
     margin: 30px auto 0;
     box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    z-index: 5;
 }
 
 .love-box h2 {
@@ -92,16 +94,25 @@ button {
     border-radius: 20px;
 }
 
-/* SERCA */
+/* ❤️ SERCA */
 .heart {
     position: fixed;
     top: -20px;
     font-size: 22px;
     animation: fall linear infinite;
     pointer-events: none;
+    z-index: 1;
 }
 @keyframes fall {
     to { transform: translateY(110vh); }
+}
+
+/* 🖼️ LATAJĄCE PNG */
+.flying {
+    position: fixed;
+    width: 140px;
+    pointer-events: none;
+    z-index: 10;
 }
 </style>
 </head>
@@ -112,7 +123,7 @@ button {
 
     <h1 id="question">Zuzia, zostaniesz moją walentynką? 💘</h1>
 
-    <!-- TEN SAM BOX -->
+    <!-- TEN SAM BIAŁY BOX -->
     <div class="buttons" id="buttonsBox">
         <button id="yes">TAK</button>
         <button id="no">nie</button>
@@ -135,11 +146,8 @@ const question = document.getElementById("question");
 const texts = ["nie", "serio?", "ej 😳", "no weź", "💔"];
 let step = 0;
 
-/* 🧠 UCIEKANIE – ZAWSZE CAŁY PRZYCISK W ŚRODKU */
+/* UCIEKANIE "NIE" */
 noBtn.addEventListener("mousemove", () => {
-    const boxRect = box.getBoundingClientRect();
-
-    // 🔥 AKTUALNY ROZMIAR PRZYCISKU (Z TEKSTEM)
     const btnWidth = noBtn.offsetWidth;
     const btnHeight = noBtn.offsetHeight;
 
@@ -148,7 +156,6 @@ noBtn.addEventListener("mousemove", () => {
     let left = noBtn.offsetLeft + (Math.random() * maxStep * 2 - maxStep);
     let top  = noBtn.offsetTop  + (Math.random() * maxStep * 2 - maxStep);
 
-    // 🔒 GRANICE – CAŁY PRZYCISK MUSI SIĘ ZMIEŚCIĆ
     left = Math.max(0, Math.min(box.clientWidth  - btnWidth,  left));
     top  = Math.max(0, Math.min(box.clientHeight - btnHeight, top));
 
@@ -159,14 +166,16 @@ noBtn.addEventListener("mousemove", () => {
     noBtn.textContent = texts[step];
 });
 
-/* ✅ TAK */
+/* ✅ KLIK TAK */
 yesBtn.addEventListener("click", () => {
-    box.style.display = "none";
+    box.style.display = "none";      // ⬅️ BIAŁY BOX ZNIKA
     question.style.display = "none";
     loveBox.style.display = "block";
+
+    startFlyingPNG();                // ⬅️ PNG WRACAJĄ
 });
 
-/* ❤️ SERDUSZKA */
+/* ❤️ SERCA */
 function createHeart() {
     const h = document.createElement("div");
     h.className = "heart";
@@ -177,6 +186,42 @@ function createHeart() {
     setTimeout(() => h.remove(), 7000);
 }
 setInterval(createHeart, 400);
+
+/* 🖼️ LATAJĄCE PNG (DVD STYLE) */
+function startFlyingPNG(){
+    const imgs = [];
+    const count = 4;
+
+    for(let i=0;i<count;i++){
+        const img = document.createElement("img");
+        img.src = "meme1.png";
+        img.className = "flying";
+        document.body.appendChild(img);
+
+        imgs.push({
+            el: img,
+            x: Math.random() * (window.innerWidth - 150),
+            y: Math.random() * (window.innerHeight - 150),
+            vx: (Math.random() * 3 + 2) * (Math.random() < 0.5 ? -1 : 1),
+            vy: (Math.random() * 3 + 2) * (Math.random() < 0.5 ? -1 : 1)
+        });
+    }
+
+    function animate(){
+        imgs.forEach(p=>{
+            p.x += p.vx;
+            p.y += p.vy;
+
+            if(p.x <= 0 || p.x >= window.innerWidth - 150) p.vx *= -1;
+            if(p.y <= 0 || p.y >= window.innerHeight - 150) p.vy *= -1;
+
+            p.el.style.left = p.x + "px";
+            p.el.style.top  = p.y + "px";
+        });
+        requestAnimationFrame(animate);
+    }
+    animate();
+}
 </script>
 
 </body>
