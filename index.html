@@ -6,106 +6,123 @@
 <title>Walentynka 💕</title>
 <style>
 body {
-    margin: 0;
-    height: 100vh;
-    background-color: #f6c1d1;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-family: Arial, sans-serif;
-    overflow: hidden;
+  margin: 0;
+  height: 100vh;
+  background-color: #f6c1d1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: Arial, sans-serif;
+  overflow: hidden;
 }
 
-/* 🔹 Duże serce z animowanym gradientem */
+/* 🔹 Prawdziwe serce z gradientem */
 .container {
-    width: 400px;
-    height: 400px;
-    background: radial-gradient(circle at center, #ffe4e1 60%, #ff0000 100%);
-    clip-path: polygon(
-        50% 15%, 61% 5%, 75% 15%, 85% 30%, 80% 50%,
-        50% 90%, 20% 50%, 15% 30%, 25% 15%, 39% 5%
-    );
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    position: relative;
-    z-index: 2;
-    text-align: center;
-    animation: heartbeat 1s infinite, gradientPulse 4s infinite alternate;
+  position: relative;
+  width: 300px;
+  height: 300px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 2;
+  text-align: center;
+  animation: heartbeat 1s infinite, gradientPulse 4s infinite alternate;
+}
+
+.container::before,
+.container::after {
+  content: "";
+  position: absolute;
+  width: 150px;
+  height: 150px;
+  background: radial-gradient(circle at center, #ffccd5, #ff0000);
+  border-radius: 50%;
+  top: 0;
+}
+
+.container::before { left: 50px; }
+.container::after { right: 50px; }
+
+.container-heart-shape {
+  position: absolute;
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle at center, #ffccd5, #ff0000);
+  transform: rotate(-45deg);
+  border-radius: 0 0 150px 150px;
+  z-index: -1;
 }
 
 /* 🔹 Animacja bicia serca */
 @keyframes heartbeat {
-    0% { transform: scale(1); }
-    25% { transform: scale(1.05); }
-    40% { transform: scale(0.95); }
-    60% { transform: scale(1.1); }
-    80% { transform: scale(0.95); }
-    100% { transform: scale(1); }
+  0% { transform: scale(1); }
+  25% { transform: scale(1.05); }
+  40% { transform: scale(0.95); }
+  60% { transform: scale(1.1); }
+  80% { transform: scale(0.95); }
+  100% { transform: scale(1); }
 }
 
-/* 🔹 Animowany gradient */
+/* 🔹 Animacja gradientu */
 @keyframes gradientPulse {
-    0% { background: radial-gradient(circle at center, #ffe4e1 60%, #ff0000 100%); }
-    50% { background: radial-gradient(circle at center, #ffd1dc 60%, #ff0044 100%); }
-    100% { background: radial-gradient(circle at center, #ffe4e1 60%, #ff0000 100%); }
+  0% { background: radial-gradient(circle at center, #ffccd5 60%, #ff0000 100%); }
+  50% { background: radial-gradient(circle at center, #ff99aa 60%, #ff0044 100%); }
+  100% { background: radial-gradient(circle at center, #ffccd5 60%, #ff0000 100%); }
 }
 
-/* Tekst w środku serca */
 h1 {
-    font-size: 24px;
-    color: #fff;
-    margin-bottom: 20px;
-    z-index: 3;
-    text-align: center;
+  font-size: 24px;
+  color: #fff;
+  margin-bottom: 20px;
+  z-index: 3;
 }
 
 .big-love {
-    display: none;
-    font-size: 42px;
-    color: #e91e63;
-    font-weight: bold;
-    margin-bottom: 20px;
-    z-index: 3;
+  display: none;
+  font-size: 42px;
+  color: #e91e63;
+  font-weight: bold;
+  margin-bottom: 20px;
+  z-index: 3;
 }
 
 .love-photo {
-    display: none;
-    position: relative;
-    justify-content: center;
-    align-items: center;
-    margin-bottom: 20px;
-    z-index: 3;
+  display: none;
+  position: relative;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 20px;
+  z-index: 3;
 }
 
 .love-photo img {
-    border-radius: 25px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+  border-radius: 25px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.25);
 }
 
 #mainPhoto { height: 200px; }
 
 .buttons {
-    position: relative;
-    height: auto;
-    z-index: 3;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
+  position: relative;
+  height: auto;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
 button {
-    font-size: 22px;
-    padding: 15px 25px;
-    border: none;
-    border-radius: 40px;
-    margin: 10px;
-    cursor: pointer;
-    min-width: 100px;
-    transition: all 0.1s ease;
-    position: relative;
+  font-size: 22px;
+  padding: 15px 25px;
+  border: none;
+  border-radius: 40px;
+  margin: 10px;
+  cursor: pointer;
+  min-width: 100px;
+  transition: all 0.1s ease;
+  position: relative;
 }
 
 #yes { background-color: #ff5c8a; color: white; }
@@ -124,25 +141,25 @@ button {
 @keyframes fall { to { transform: translateY(110vh); } }
 
 .flying { position: fixed; width: 150px; height: auto; pointer-events: none; z-index: 5; transform-origin: center center; }
+
 </style>
 </head>
 <body>
 <div class="container">
-    <h1 id="question">Zuzia, zostaniesz moją walentynką? 💘</h1>
-    <div class="big-love" id="bigLove">KOCHAM CIĘ MINIO ❤️</div>
-    <div class="love-photo" id="lovePhotoContainer">
-        <img id="mainPhoto" src="nasze-zdjecie.jpg" alt="Nasze zdjęcie">
-    </div>
-    <div class="buttons" id="buttonsBox">
-        <button id="yes">TAK</button>
-        <button id="no">nie</button>
-    </div>
+  <div class="container-heart-shape"></div>
+  <h1 id="question">Zuzia, zostaniesz moją walentynką? 💘</h1>
+  <div class="big-love" id="bigLove">KOCHAM CIĘ MINIO ❤️</div>
+  <div class="love-photo" id="lovePhotoContainer">
+      <img id="mainPhoto" src="nasze-zdjecie.jpg" alt="Nasze zdjęcie">
+  </div>
+  <div class="buttons" id="buttonsBox">
+      <button id="yes">TAK</button>
+      <button id="no">nie</button>
+  </div>
 </div>
 
-<audio id="loveSound" src="love-sound.mp3"></audio>
-
 <script>
-// Przyciski i animacje
+// Przycisk "nie"
 const noButton=document.getElementById("no");
 const yesButton=document.getElementById("yes");
 const buttonsBox=document.getElementById("buttonsBox");
@@ -152,7 +169,6 @@ const mainPhoto=document.getElementById("mainPhoto");
 const texts=["nie","no minio","A zrób minkę :(","chyba żart..."];
 let step=0;
 
-// 🔹 Przycisk "nie" ograniczony do serca
 function moveNoSafe(e){
     const btnRect=noButton.getBoundingClientRect();
     const containerRect=document.querySelector(".container").getBoundingClientRect();
@@ -171,7 +187,6 @@ function moveNoSafe(e){
     let newLeft = btnRect.left + dx;
     let newTop = btnRect.top + dy;
 
-    // ograniczenie do obszaru serca
     newLeft = Math.max(containerRect.left, Math.min(containerRect.right - btnRect.width, newLeft));
     newTop = Math.max(containerRect.top, Math.min(containerRect.bottom - btnRect.height, newTop));
 
@@ -196,8 +211,9 @@ buttonsBox.addEventListener("touchstart",e=>{if(e.target.id==="no"){moveNoSafe(e
 yesButton.addEventListener("click",()=>{
     document.getElementById("question").style.display="none";
     document.getElementById("buttonsBox").style.display="none";
-    bigLove.style.display="block"; bigLove.classList.add("pulse");
-    lovePhotoContainer.style.display="flex"; mainPhoto.style.display="block";
+    bigLove.style.display="block";
+    lovePhotoContainer.style.display="flex";
+    mainPhoto.style.display="block";
 });
 </script>
 </body>
