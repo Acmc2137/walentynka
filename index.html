@@ -16,21 +16,26 @@ body {
     overflow: hidden;
 }
 .container {
-    width: 90%;
-    max-width: 450px;
+    width: 95%;
+    max-width: 600px;  /* większe pole */
+    height: 90vh;      /* większe pole w pionie */
     background: linear-gradient(135deg, #fff0f5, #ffe4e1);
-    padding: 30px 20px;
+    padding: 40px 30px;
     border-radius: 30px;
     text-align: center;
     position: relative;
     z-index: 2;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 }
-h1 { font-size: 24px; color: #c2185b; margin-bottom: 30px; }
+h1 { font-size: 28px; color: #c2185b; margin-bottom: 30px; }
 .big-love { display: none; font-size: 42px; color: #e91e63; font-weight: bold; margin-bottom: 20px; }
 .love-photo { display: none; position: relative; justify-content: center; align-items: center; margin-bottom: 20px; }
 .love-photo img { border-radius: 25px; box-shadow: 0 10px 25px rgba(0,0,0,0.25); }
 #mainPhoto { height: 250px; }
-.buttons { position: relative; height: 190px; }
+.buttons { position: relative; width: 100%; height: 200px; }
 button {
     font-size: 22px;
     padding: 15px 25px;
@@ -54,7 +59,7 @@ button {
 </style>
 </head>
 <body>
-<div class="container">
+<div class="container" id="container">
     <h1 id="question">Zuzia, zostaniesz moją walentynką? 💘</h1>
     <div class="big-love" id="bigLove">KOCHAM CIĘ MINIO ❤️</div>
     <div class="love-photo" id="lovePhotoContainer">
@@ -75,31 +80,35 @@ const yesButton = document.getElementById("yes");
 const bigLove = document.getElementById("bigLove");
 const lovePhotoContainer = document.getElementById("lovePhotoContainer");
 const mainPhoto = document.getElementById("mainPhoto");
+const container = document.getElementById("container");
 const texts = ["nie", "no minio", "A zrób minkę :(", "chyba żart..."];
 let step = 0;
 
-// 🔹 Płynny przycisk "nie" – nigdy nie wychodzi poza ekran
+// 🔹 Przyciski „nie” ograniczone do kontenera
 function moveNo(e) {
-    const screenW = window.innerWidth;
-    const screenH = window.innerHeight;
+    const containerRect = container.getBoundingClientRect();
     const btnRect = noButton.getBoundingClientRect();
+
     const mouseX = e.clientX;
     const mouseY = e.clientY;
-
-    const dx = btnRect.left + btnRect.width / 2 - mouseX;
-    const dy = btnRect.top + btnRect.height / 2 - mouseY;
+    const centerX = btnRect.left + btnRect.width / 2;
+    const centerY = btnRect.top + btnRect.height / 2;
+    const dx = centerX - mouseX;
+    const dy = centerY - mouseY;
     const dist = Math.sqrt(dx*dx + dy*dy);
 
-    if(dist < 150){
-        // ruch w przeciwnym kierunku, ograniczony do ekranu
-        let moveX = dx / dist * 30; // max 30px
-        let moveY = dy / dist * 30;
+    if(dist < 120) {
+        // ruch przeciwny do kursora, max 30px
+        let moveX = (dx/dist) * Math.min(30, 120-dist);
+        let moveY = (dy/dist) * Math.min(30, 120-dist);
 
-        let newLeft = btnRect.left + moveX;
-        let newTop = btnRect.top + moveY;
+        // obliczamy nową pozycję w obrębie kontenera
+        let newLeft = btnRect.left + moveX - containerRect.left;
+        let newTop = btnRect.top + moveY - containerRect.top;
 
-        newLeft = Math.max(0, Math.min(screenW - btnRect.width, newLeft));
-        newTop = Math.max(0, Math.min(screenH - btnRect.height, newTop));
+        // ograniczenie do kontenera
+        newLeft = Math.max(0, Math.min(containerRect.width - btnRect.width, newLeft));
+        newTop = Math.max(0, Math.min(containerRect.height - btnRect.height, newTop));
 
         noButton.style.left = newLeft + "px";
         noButton.style.top = newTop + "px";
@@ -110,17 +119,14 @@ function moveNo(e) {
 
         // lekki obrót
         const angle = (Math.random()*20 - 10);
-        noButton.style.transform = `translateX(-50%) rotate(${angle}deg)`;
-        setTimeout(()=>{ noButton.style.transform = `translateX(-50%) rotate(0deg)`; }, 200);
-
-        if(navigator.vibrate) navigator.vibrate(30);
+        noButton.style.transform = `translateX(0) rotate(${angle}deg)`;
+        setTimeout(()=>{ noButton.style.transform = `translateX(0) rotate(0deg)`; }, 200);
     }
 }
 noButton.addEventListener("mousemove", moveNo);
 
 // 🔹 Kliknięcie TAK
 yesButton.addEventListener("click", () => {
-    if(navigator.vibrate) navigator.vibrate([200,100,200,100,400]);
     document.getElementById("question").style.display = "none";
     document.getElementById("buttonsBox").style.display = "none";
     bigLove.style.display = "block"; bigLove.classList.add("pulse");
