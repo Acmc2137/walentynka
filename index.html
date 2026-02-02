@@ -75,7 +75,7 @@ button{
 .love-box h2{color:#e91e63;margin-bottom:15px;}
 .love-box img{max-width:240px;border-radius:20px;}
 
-/* PNG – 180px */
+/* PNG */
 .flying{
     position:fixed;
     width:180px;
@@ -109,7 +109,7 @@ button{
 
     <div class="love-box" id="loveBox">
         <h2>Kocham Cię minio ❤️</h2>
-        <img src="nasze-zdjecie.jpg">
+        <img src="nasze-zdjecie.jpg" alt="Nasze zdjęcie">
     </div>
 </div>
 
@@ -176,13 +176,27 @@ yesBtn.addEventListener("click",()=>{
     startFlyingPNG();
 });
 
-/* PNG – START POZA BOXEM, odbicia z losowym przyspieszeniem */
+/* PNG – LATAJĄ PO EKRANIE I ODBIJAJĄ SIĘ OD BOXA + NIE WCHODZĄ W ROGI */
 function startFlyingPNG(){
     const pngs=[];
     const count=8;
     const size=180;
-    const boxRect=container.getBoundingClientRect();
 
+    // 🔥 Strefa zakazana przy krawędziach ekranu (eliminuje rogi)
+    const EDGE_PAD = 50; // zwiększ np. do 70 jeśli chcesz bardziej odsunąć od rogów
+
+    // wymiary "dozwolonego pola" dla PNG (żeby nie wchodziły w rogi)
+    const minX = EDGE_PAD;
+    const minY = EDGE_PAD;
+    const maxX = () => window.innerWidth  - size - EDGE_PAD;
+    const maxY = () => window.innerHeight - size - EDGE_PAD;
+
+    function randSpeed(){
+        const s = Math.random()*2.5 + 2.5; // 2.5..5.0
+        return s * (Math.random()<0.5 ? -1 : 1);
+    }
+
+    // start poza białym boxem (przeszkodą)
     for(let i=0;i<count;i++){
         const img=document.createElement("img");
         img.src="meme1.png";
@@ -190,60 +204,103 @@ function startFlyingPNG(){
         document.body.appendChild(img);
 
         let x, y;
-        do {
-            x=Math.random()*(window.innerWidth-size);
-            y=Math.random()*(window.innerHeight-size);
-        } while (
-            x+size>boxRect.left &&
-            x<boxRect.right &&
-            y+size>boxRect.top &&
-            y<boxRect.bottom
-        );
+        do{
+            x = minX + Math.random() * Math.max(1, (maxX()-minX));
+            y = minY + Math.random() * Math.max(1, (maxY()-minY));
+        } while (intersectsBox(x,y,size, container.getBoundingClientRect()));
 
-        pngs.push({
-            el:img,
-            x:x,
-            y:y,
-            vx:(Math.random()*3+2)*(Math.random()<0.5?-1:1),
-            vy:(Math.random()*3+2)*(Math.random()<0.5?-1:1)
-        });
+        pngs.push({ el:img, x, y, vx: randSpeed(), vy: randSpeed() });
+    }
+
+    function intersectsBox(x,y,s, rect){
+        return (x+s>rect.left && x<rect.right && y+s>rect.top && y<rect.bottom);
+    }
+
+    function ensureMinSpeed(p){
+        const min = 1.8;
+        if(Math.abs(p.vx) < min) p.vx = min * Math.sign(p.vx || 1);
+        if(Math.abs(p.vy) < min) p.vy = min * Math.sign(p.vy || 1);
+    }
+
+    function kick(p){
+        // mały losowy impuls żeby nie “wpaść w pętlę”
+        p.vx += (Math.random()*0.8 - 0.4);
+        p.vy += (Math.random()*0.8 - 0.4);
+        ensureMinSpeed(p);
     }
 
     function animate(){
-        const boxRect=container.getBoundingClientRect();
+        const boxRect = container.getBoundingClientRect();
+        const xMax = maxX();
+        const yMax = maxY();
+
         pngs.forEach(p=>{
-            p.x+=p.vx;
-            p.y+=p.vy;
+            p.x += p.vx;
+            p.y += p.vy;
 
-            // odbicie od ekranu
-            if(p.x<=0||p.x>=window.innerWidth-size){ p.vx*=-1; p.vx+=Math.random()*0.5-0.25; }
-            if(p.y<=0||p.y>=window.innerHeight-size){ p.vy*=-1; p.vy+=Math.random()*0.5-0.25; }
-
-            // odbicie od boxa
-            if(
-                p.x+size>boxRect.left &&
-                p.x<boxRect.right &&
-                p.y+size>boxRect.top &&
-                p.y<boxRect.bottom
-            ){
-                p.vx*=-1;
-                p.vy*=-1;
-                // lekki losowy impuls, żeby nie wpaść w narożnik
-                p.vx += Math.random()*0.5-0.25;
-                p.vy += Math.random()*0.5-0.25;
-
-                // minimalny przesuw w bezpieczne miejsce
-                if(p.x+size>boxRect.left && p.x<boxRect.right)
-                    p.x = p.vx>0 ? boxRect.left-size-1 : boxRect.right+1;
-                if(p.y+size>boxRect.top && p.y<boxRect.bottom)
-                    p.y = p.vy>0 ? boxRect.top-size-1 : boxRect.bottom+1;
+            // odbicie od "bezpiecznych" krawędzi (z paddingiem)
+            if(p.x <= minX){
+                p.x = minX;
+                p.vx = Math.abs(p.vx);
+                kick(p);
+            } else if(p.x >= xMax){
+                p.x = xMax;
+                p.vx = -Math.abs(p.vx);
+                kick(p);
             }
 
-            p.el.style.left=p.x+"px";
-            p.el.style.top=p.y+"px";
+            if(p.y <= minY){
+                p.y = minY;
+                p.vy = Math.abs(p.vy);
+                kick(p);
+            } else if(p.y >= yMax){
+                p.y = yMax;
+                p.vy = -Math.abs(p.vy);
+                kick(p);
+            }
+
+            // kolizja z białym boxem (przeszkodą)
+            if(intersectsBox(p.x, p.y, size, boxRect)){
+                // cofamy krok i odbijamy w osi, która bardziej "weszła" w przeszkodę
+                p.x -= p.vx;
+                p.y -= p.vy;
+
+                const cx = p.x + size/2;
+                const cy = p.y + size/2;
+                const boxCx = (boxRect.left + boxRect.right)/2;
+                const boxCy = (boxRect.top + boxRect.bottom)/2;
+
+                // odbij “bardziej” w stronę oddalającą od środka boxa
+                if(Math.abs(cx - boxCx) > Math.abs(cy - boxCy)){
+                    p.vx *= -1;
+                } else {
+                    p.vy *= -1;
+                }
+                kick(p);
+
+                // wypchnij delikatnie poza box (żeby nie utkwił na krawędzi)
+                while(intersectsBox(p.x,p.y,size,boxRect)){
+                    p.x += Math.sign(p.vx) * 2;
+                    p.y += Math.sign(p.vy) * 2;
+                }
+            }
+
+            // dodatkowy “anti-corner” kick, gdy obiekt jest blisko narożników pola dozwolonego
+            const nearLeft = (p.x - minX) < 6;
+            const nearRight = (xMax - p.x) < 6;
+            const nearTop = (p.y - minY) < 6;
+            const nearBottom = (yMax - p.y) < 6;
+            if((nearLeft || nearRight) && (nearTop || nearBottom)){
+                kick(p);
+            }
+
+            p.el.style.left = p.x + "px";
+            p.el.style.top  = p.y + "px";
         });
+
         requestAnimationFrame(animate);
     }
+
     animate();
 }
 </script>
