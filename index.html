@@ -6,302 +6,282 @@
 
 <style>
 body{
-    margin:0;
-    height:100vh;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    background:#f6c1d1;
-    font-family:Arial, sans-serif;
-    overflow:hidden;
+  margin:0;
+  height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  background:#f6c1d1;
+  font-family:Arial, sans-serif;
+  overflow:hidden;
 }
 
 .container{
-    width:750px;
-    height:520px;
-    background:white;
-    border-radius:30px;
-    padding:30px;
-    box-sizing:border-box;
-    text-align:center;
-    position:relative;
-    z-index:3;
-    box-shadow:0 20px 40px rgba(0,0,0,0.25);
+  width:750px;
+  height:520px;
+  background:white;
+  border-radius:30px;
+  padding:30px;
+  box-sizing:border-box;
+  text-align:center;
+  position:relative;
+  z-index:3;
+  box-shadow:0 20px 40px rgba(0,0,0,0.25);
 }
 
-h1{color:#c2185b;margin-bottom:30px;}
+h1{ color:#c2185b; margin-bottom:30px; }
 
 .buttons{
-    width:360px;
-    height:220px;
-    margin:0 auto;
-    position:relative;
+  width:360px;
+  height:220px;
+  margin:0 auto;
+  position:relative;
 }
 
 button{
-    position:absolute;
-    padding:12px 26px;
-    font-size:20px;
-    border:none;
-    border-radius:30px;
-    cursor:pointer;
-    white-space:nowrap;
-    z-index:4;
-    transition:left 0.25s ease, top 0.25s ease;
+  position:absolute;
+  padding:12px 26px;
+  font-size:20px;
+  border:none;
+  border-radius:30px;
+  cursor:pointer;
+  white-space:nowrap;
+  z-index:4;
+  transition:left 0.25s ease, top 0.25s ease;
 }
 
 #yes{
-    background:#ff5c8a;
-    color:white;
-    left:50%;
-    top:40px;
-    transform:translateX(-50%);
+  background:#ff5c8a;
+  color:white;
+  left:50%;
+  top:40px;
+  transform:translateX(-50%);
 }
 
 #no{
-    background:#ddd;
-    left:50%;
-    top:120px;
-    transform:translateX(-50%);
+  background:#ddd;
+  left:50%;
+  top:120px;
+  transform:translateX(-50%);
 }
 
 .love-box{
-    display:none;
-    margin-top:10px;
-    position:relative;
-    z-index:4;
+  display:none;
+  margin-top:10px;
+  position:relative;
+  z-index:4;
 }
-
-.love-box h2{color:#e91e63;margin-bottom:15px;}
-.love-box img{max-width:240px;border-radius:20px;}
+.love-box h2{ color:#e91e63; margin-bottom:15px; }
+.love-box img{ max-width:240px; border-radius:20px; }
 
 /* PNG */
 .flying{
-    position:fixed;
-    width:180px;
-    pointer-events:none;
-    z-index:1;
+  position:fixed;
+  width:180px;
+  pointer-events:none;
+  z-index:1;
 }
 
 /* SERDUSZKA */
 .heart{
-    position:fixed;
-    top:-30px;
-    font-size:24px;
-    animation:fall linear infinite;
-    opacity:0.85;
-    pointer-events:none;
-    z-index:0;
+  position:fixed;
+  top:-30px;
+  font-size:24px;
+  animation:fall linear infinite;
+  opacity:0.85;
+  pointer-events:none;
+  z-index:0;
 }
-@keyframes fall{to{transform:translateY(110vh);}}
+@keyframes fall{ to{ transform:translateY(110vh); } }
 </style>
 </head>
 
 <body>
 
 <div class="container" id="container">
-    <h1 id="question">Zuzia, zostaniesz moją walentynką? 💘</h1>
+  <h1 id="question">Zuzia, zostaniesz moją walentynką? 💘</h1>
 
-    <div class="buttons" id="buttonsBox">
-        <button id="yes">TAK</button>
-        <button id="no">nie</button>
-    </div>
+  <div class="buttons" id="buttonsBox">
+    <button id="yes">TAK</button>
+    <button id="no">nie</button>
+  </div>
 
-    <div class="love-box" id="loveBox">
-        <h2>Kocham Cię minio ❤️</h2>
-        <img src="nasze-zdjecie.jpg" alt="Nasze zdjęcie">
-    </div>
+  <div class="love-box" id="loveBox">
+    <h2>Kocham Cię minio ❤️</h2>
+    <img src="nasze-zdjecie.jpg" alt="Nasze zdjęcie">
+  </div>
 </div>
 
 <script>
-/* SERDUSZKA */
+/* ❤️ SERDUSZKA */
 function createHeart(){
-    const h=document.createElement("div");
-    h.className="heart";
-    h.textContent="❤️";
-    h.style.left=Math.random()*100+"vw";
-    h.style.fontSize=(18+Math.random()*20)+"px";
-    h.style.animationDuration=(4+Math.random()*4)+"s";
-    document.body.appendChild(h);
-    setTimeout(()=>h.remove(),8000);
+  const h=document.createElement("div");
+  h.className="heart";
+  h.textContent="❤️";
+  h.style.left=Math.random()*100+"vw";
+  h.style.fontSize=(18+Math.random()*20)+"px";
+  h.style.animationDuration=(4+Math.random()*4)+"s";
+  document.body.appendChild(h);
+  setTimeout(()=>h.remove(),8000);
 }
 setInterval(createHeart,350);
 
-/* PRZYCISK NIE */
+/* 🙅 PRZYCISK NIE – płynne uciekanie + cooldown tekstu */
 const noBtn=document.getElementById("no");
 const box=document.getElementById("buttonsBox");
 const texts=["nie","serio?","ej 😳","no weź","💔"];
 let textIndex=0, lastChange=0;
 
 noBtn.addEventListener("mousemove",(e)=>{
-    const now=Date.now();
-    const boxRect=box.getBoundingClientRect();
-    const btnRect=noBtn.getBoundingClientRect();
+  const now=Date.now();
+  const boxRect=box.getBoundingClientRect();
+  const btnRect=noBtn.getBoundingClientRect();
 
-    const dx=(btnRect.left+btnRect.width/2)-e.clientX;
-    const dy=(btnRect.top+btnRect.height/2)-e.clientY;
-    const dist=Math.hypot(dx,dy);
+  const dx=(btnRect.left+btnRect.width/2)-e.clientX;
+  const dy=(btnRect.top+btnRect.height/2)-e.clientY;
+  const dist=Math.hypot(dx,dy);
 
-    if(dist<120){
-        const angle=Math.atan2(dy,dx);
-        const move=35;
+  if(dist<120){
+    const angle=Math.atan2(dy,dx);
+    const move=35;
 
-        let left=(btnRect.left-boxRect.left)+Math.cos(angle)*move;
-        let top =(btnRect.top -boxRect.top )+Math.sin(angle)*move;
+    let left=(btnRect.left-boxRect.left)+Math.cos(angle)*move;
+    let top =(btnRect.top -boxRect.top )+Math.sin(angle)*move;
 
-        left=Math.max(0,Math.min(box.clientWidth-btnRect.width,left));
-        top =Math.max(0,Math.min(box.clientHeight-btnRect.height,top));
+    left=Math.max(0,Math.min(box.clientWidth-btnRect.width,left));
+    top =Math.max(0,Math.min(box.clientHeight-btnRect.height,top));
 
-        noBtn.style.left=left+"px";
-        noBtn.style.top =top +"px";
+    noBtn.style.left=left+"px";
+    noBtn.style.top =top +"px";
 
-        if(now-lastChange>600 && textIndex<texts.length-1){
-            textIndex++;
-            noBtn.textContent=texts[textIndex];
-            lastChange=now;
-        }
+    if(now-lastChange>600 && textIndex<texts.length-1){
+      textIndex++;
+      noBtn.textContent=texts[textIndex];
+      lastChange=now;
     }
+  }
 });
 
-/* TAK */
+/* ✅ TAK */
 const yesBtn=document.getElementById("yes");
 const loveBox=document.getElementById("loveBox");
 const question=document.getElementById("question");
 const container=document.getElementById("container");
 
 yesBtn.addEventListener("click",()=>{
-    document.getElementById("buttonsBox").style.display="none";
-    question.style.display="none";
-    loveBox.style.display="block";
-    startFlyingPNG();
+  document.getElementById("buttonsBox").style.display="none";
+  question.style.display="none";
+  loveBox.style.display="block";
+  startFlyingPNG();
 });
 
-/* PNG – LATAJĄ PO EKRANIE I ODBIJAJĄ SIĘ OD BOXA + NIE WCHODZĄ W ROGI */
+/* 🖼️ PNG – latają POZA boxem i odbijają się od niego bez “klejenia” */
 function startFlyingPNG(){
-    const pngs=[];
-    const count=8;
-    const size=180;
+  const pngs = [];
+  const count = 12;     // ✅ więcej PNG
+  const size  = 180;    // musi pasować do .flying width
+  const EPS   = 3;      // odskok od przeszkody, żeby nie łapało kolizji co klatkę
+  const BOX_COOLDOWN_FRAMES = 8;
 
-    // 🔥 Strefa zakazana przy krawędziach ekranu (eliminuje rogi)
-    const EDGE_PAD = 50; // zwiększ np. do 70 jeśli chcesz bardziej odsunąć od rogów
+  function randSpeed(){
+    const s = Math.random()*2.2 + 2.8; // 2.8..5.0
+    return s * (Math.random()<0.5 ? -1 : 1);
+  }
 
-    // wymiary "dozwolonego pola" dla PNG (żeby nie wchodziły w rogi)
-    const minX = EDGE_PAD;
-    const minY = EDGE_PAD;
-    const maxX = () => window.innerWidth  - size - EDGE_PAD;
-    const maxY = () => window.innerHeight - size - EDGE_PAD;
+  function intersectsBox(x,y,s, r){
+    return (x+s > r.left && x < r.right && y+s > r.top && y < r.bottom);
+  }
 
-    function randSpeed(){
-        const s = Math.random()*2.5 + 2.5; // 2.5..5.0
-        return s * (Math.random()<0.5 ? -1 : 1);
+  function ensureMinSpeed(p){
+    const min = 2.0;
+    if (Math.abs(p.vx) < min) p.vx = min * Math.sign(p.vx || 1);
+    if (Math.abs(p.vy) < min) p.vy = min * Math.sign(p.vy || 1);
+  }
+
+  function kick(p){
+    p.vx += (Math.random()*0.6 - 0.3);
+    p.vy += (Math.random()*0.6 - 0.3);
+    ensureMinSpeed(p);
+  }
+
+  function resolveAgainstBox(p, r){
+    const leftPen   = (p.x + size) - r.left;
+    const rightPen  = r.right - p.x;
+    const topPen    = (p.y + size) - r.top;
+    const bottomPen = r.bottom - p.y;
+
+    const minPen = Math.min(leftPen, rightPen, topPen, bottomPen);
+
+    if (minPen === leftPen) {
+      p.x = r.left - size - EPS;
+      p.vx = -Math.abs(p.vx);
+    } else if (minPen === rightPen) {
+      p.x = r.right + EPS;
+      p.vx = Math.abs(p.vx);
+    } else if (minPen === topPen) {
+      p.y = r.top - size - EPS;
+      p.vy = -Math.abs(p.vy);
+    } else {
+      p.y = r.bottom + EPS;
+      p.vy = Math.abs(p.vy);
     }
 
-    // start poza białym boxem (przeszkodą)
-    for(let i=0;i<count;i++){
-        const img=document.createElement("img");
-        img.src="meme1.png";
-        img.className="flying";
-        document.body.appendChild(img);
+    kick(p);
+    p.boxCd = BOX_COOLDOWN_FRAMES;
+  }
 
-        let x, y;
-        do{
-            x = minX + Math.random() * Math.max(1, (maxX()-minX));
-            y = minY + Math.random() * Math.max(1, (maxY()-minY));
-        } while (intersectsBox(x,y,size, container.getBoundingClientRect()));
+  // START: losowo na ekranie, ale NIE w boxie
+  const boxRect0 = container.getBoundingClientRect();
+  for (let i=0; i<count; i++){
+    const img = document.createElement("img");
+    img.src = "meme1.png";
+    img.className = "flying";
+    document.body.appendChild(img);
 
-        pngs.push({ el:img, x, y, vx: randSpeed(), vy: randSpeed() });
-    }
+    let x, y;
+    do {
+      x = Math.random()*(window.innerWidth  - size);
+      y = Math.random()*(window.innerHeight - size);
+    } while (intersectsBox(x,y,size, boxRect0));
 
-    function intersectsBox(x,y,s, rect){
-        return (x+s>rect.left && x<rect.right && y+s>rect.top && y<rect.bottom);
-    }
+    pngs.push({ el: img, x, y, vx: randSpeed(), vy: randSpeed(), boxCd: 0 });
+  }
 
-    function ensureMinSpeed(p){
-        const min = 1.8;
-        if(Math.abs(p.vx) < min) p.vx = min * Math.sign(p.vx || 1);
-        if(Math.abs(p.vy) < min) p.vy = min * Math.sign(p.vy || 1);
-    }
+  function animate(){
+    const boxRect = container.getBoundingClientRect();
 
-    function kick(p){
-        // mały losowy impuls żeby nie “wpaść w pętlę”
-        p.vx += (Math.random()*0.8 - 0.4);
-        p.vy += (Math.random()*0.8 - 0.4);
-        ensureMinSpeed(p);
-    }
+    pngs.forEach(p=>{
+      if (p.boxCd > 0) p.boxCd--;
 
-    function animate(){
-        const boxRect = container.getBoundingClientRect();
-        const xMax = maxX();
-        const yMax = maxY();
+      p.x += p.vx;
+      p.y += p.vy;
 
-        pngs.forEach(p=>{
-            p.x += p.vx;
-            p.y += p.vy;
+      // odbicia od krawędzi ekranu
+      if (p.x <= 0){
+        p.x = 0; p.vx = Math.abs(p.vx); kick(p);
+      } else if (p.x >= window.innerWidth - size){
+        p.x = window.innerWidth - size; p.vx = -Math.abs(p.vx); kick(p);
+      }
 
-            // odbicie od "bezpiecznych" krawędzi (z paddingiem)
-            if(p.x <= minX){
-                p.x = minX;
-                p.vx = Math.abs(p.vx);
-                kick(p);
-            } else if(p.x >= xMax){
-                p.x = xMax;
-                p.vx = -Math.abs(p.vx);
-                kick(p);
-            }
+      if (p.y <= 0){
+        p.y = 0; p.vy = Math.abs(p.vy); kick(p);
+      } else if (p.y >= window.innerHeight - size){
+        p.y = window.innerHeight - size; p.vy = -Math.abs(p.vy); kick(p);
+      }
 
-            if(p.y <= minY){
-                p.y = minY;
-                p.vy = Math.abs(p.vy);
-                kick(p);
-            } else if(p.y >= yMax){
-                p.y = yMax;
-                p.vy = -Math.abs(p.vy);
-                kick(p);
-            }
+      // kolizja z boxem (przeszkodą) — z cooldownem i wypchnięciem
+      if (p.boxCd === 0 && intersectsBox(p.x, p.y, size, boxRect)){
+        resolveAgainstBox(p, boxRect);
+      }
 
-            // kolizja z białym boxem (przeszkodą)
-            if(intersectsBox(p.x, p.y, size, boxRect)){
-                // cofamy krok i odbijamy w osi, która bardziej "weszła" w przeszkodę
-                p.x -= p.vx;
-                p.y -= p.vy;
+      p.el.style.left = p.x + "px";
+      p.el.style.top  = p.y + "px";
+    });
 
-                const cx = p.x + size/2;
-                const cy = p.y + size/2;
-                const boxCx = (boxRect.left + boxRect.right)/2;
-                const boxCy = (boxRect.top + boxRect.bottom)/2;
+    requestAnimationFrame(animate);
+  }
 
-                // odbij “bardziej” w stronę oddalającą od środka boxa
-                if(Math.abs(cx - boxCx) > Math.abs(cy - boxCy)){
-                    p.vx *= -1;
-                } else {
-                    p.vy *= -1;
-                }
-                kick(p);
-
-                // wypchnij delikatnie poza box (żeby nie utkwił na krawędzi)
-                while(intersectsBox(p.x,p.y,size,boxRect)){
-                    p.x += Math.sign(p.vx) * 2;
-                    p.y += Math.sign(p.vy) * 2;
-                }
-            }
-
-            // dodatkowy “anti-corner” kick, gdy obiekt jest blisko narożników pola dozwolonego
-            const nearLeft = (p.x - minX) < 6;
-            const nearRight = (xMax - p.x) < 6;
-            const nearTop = (p.y - minY) < 6;
-            const nearBottom = (yMax - p.y) < 6;
-            if((nearLeft || nearRight) && (nearTop || nearBottom)){
-                kick(p);
-            }
-
-            p.el.style.left = p.x + "px";
-            p.el.style.top  = p.y + "px";
-        });
-
-        requestAnimationFrame(animate);
-    }
-
-    animate();
+  animate();
 }
 </script>
 
