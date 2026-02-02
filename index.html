@@ -54,7 +54,7 @@ h1 {
 
 .buttons {
     position: relative;
-    height: 180px;
+    height: 190px;
 }
 
 button {
@@ -79,11 +79,24 @@ button {
     color: black;
     position: absolute;
     left: 50%;
-    top: 100px;
+    top: 110px;
     transform: translateX(-50%);
 }
 
-/* serca */
+/* 😈 TRZĘSIENIE */
+.shake {
+    animation: shake 0.25s;
+}
+
+@keyframes shake {
+    0% { transform: translate(-50%, 0); }
+    25% { transform: translate(-48%, 0); }
+    50% { transform: translate(-52%, 0); }
+    75% { transform: translate(-48%, 0); }
+    100% { transform: translate(-50%, 0); }
+}
+
+/* ❤️ SERCA */
 .heart {
     position: fixed;
     top: -30px;
@@ -126,10 +139,37 @@ const noButton = document.getElementById("no");
 const yesButton = document.getElementById("yes");
 const buttonsBox = document.getElementById("buttonsBox");
 
+const texts = ["nie", "no minio", "A zrób minkę :(", "chyba żart..."];
+let step = 0;
+let scale = 1;
+
 function moveNo() {
     const box = buttonsBox.getBoundingClientRect();
-    noButton.style.left = Math.random() * (box.width - noButton.offsetWidth) + "px";
-    noButton.style.top = Math.random() * (box.height - noButton.offsetHeight) + "px";
+
+    // pozycja
+    noButton.style.left =
+        Math.random() * (box.width - noButton.offsetWidth) + "px";
+    noButton.style.top =
+        Math.random() * (box.height - noButton.offsetHeight) + "px";
+
+    // tekst (do ostatniego)
+    if (step < texts.length - 1) {
+        step++;
+        noButton.textContent = texts[step];
+    }
+
+    // zmniejszanie
+    scale -= 0.12;
+    if (scale < 0.6) scale = 0.6;
+    noButton.style.transform = `scale(${scale})`;
+
+    // kolor
+    const red = Math.min(255, 180 + step * 25);
+    noButton.style.backgroundColor = `rgb(${red},170,170)`;
+
+    // trzęsienie
+    noButton.classList.add("shake");
+    setTimeout(() => noButton.classList.remove("shake"), 250);
 }
 
 /* PC */
@@ -153,7 +193,7 @@ yesButton.addEventListener("click", () => {
     document.getElementById("lovePhoto").style.display = "block";
 });
 
-/* serduszka */
+/* ❤️ SERCA */
 function createHeart() {
     const heart = document.createElement("div");
     heart.className = "heart";
