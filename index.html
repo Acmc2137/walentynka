@@ -42,14 +42,48 @@ h1 {
     margin-bottom: 20px;
 }
 
+/* 📸 ZDJĘCIA */
 .love-photo {
     display: none;
+    position: relative;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 20px;
 }
 
 .love-photo img {
-    width: 100%;
     border-radius: 25px;
     box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+}
+
+#mainPhoto {
+    height: 250px;
+    flex-shrink: 0;
+}
+
+.side-photo {
+    display: none;
+    height: 250px;
+    flex-shrink: 0;
+    opacity: 0;
+}
+
+/* 💨 ANIMACJA WJAZDU */
+@keyframes slideFromLeft {
+    0% { transform: translateX(-200px); opacity: 0; }
+    100% { transform: translateX(0); opacity: 1; }
+}
+@keyframes slideFromRight {
+    0% { transform: translateX(200px); opacity: 0; }
+    100% { transform: translateX(0); opacity: 1; }
+}
+
+.left-animate {
+    animation: slideFromLeft 0.8s forwards;
+}
+.right-animate {
+    animation: slideFromRight 0.8s forwards;
 }
 
 .buttons {
@@ -58,15 +92,15 @@ h1 {
 }
 
 button {
-    width: 80%;
-    max-width: 260px;
     font-size: 22px;
-    padding: 15px;
+    padding: 15px 25px;
     border: none;
     border-radius: 40px;
     margin: 10px auto;
     display: block;
     transition: all 0.15s ease;
+    width: auto;
+    min-width: 100px;
 }
 
 #yes {
@@ -110,6 +144,16 @@ button {
 @keyframes fall {
     to { transform: translateY(110vh); }
 }
+
+/* 💖 PULSOWANIE */
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+}
+.pulse {
+    animation: pulse 0.6s ease infinite;
+}
 </style>
 </head>
 
@@ -123,8 +167,10 @@ button {
         KOCHAM CIĘ MINIO ❤️
     </div>
 
-    <div class="love-photo" id="lovePhoto">
-        <img src="nasze-zdjecie.jpg" alt="Nasze zdjęcie">
+    <div class="love-photo" id="lovePhotoContainer">
+        <img id="mainPhoto" src="nasze-zdjecie.jpg" alt="Nasze zdjęcie">
+        <img class="side-photo" id="leftMeme" src="meme1.jpg" alt="Meme lewy">
+        <img class="side-photo" id="rightMeme" src="meme1.jpg" alt="Meme prawy">
     </div>
 
     <div class="buttons" id="buttonsBox">
@@ -134,10 +180,17 @@ button {
 
 </div>
 
+<audio id="loveSound" src="love-sound.mp3"></audio>
+
 <script>
 const noButton = document.getElementById("no");
 const yesButton = document.getElementById("yes");
 const buttonsBox = document.getElementById("buttonsBox");
+const bigLove = document.getElementById("bigLove");
+const lovePhotoContainer = document.getElementById("lovePhotoContainer");
+const leftMeme = document.getElementById("leftMeme");
+const rightMeme = document.getElementById("rightMeme");
+const mainPhoto = document.getElementById("mainPhoto");
 
 const texts = ["nie", "no minio", "A zrób minkę :(", "chyba żart..."];
 let step = 0;
@@ -145,37 +198,28 @@ let scale = 1;
 
 function moveNo() {
     const box = buttonsBox.getBoundingClientRect();
+    noButton.style.left = Math.random() * (box.width - noButton.offsetWidth) + "px";
+    noButton.style.top = Math.random() * (box.height - noButton.offsetHeight) + "px";
 
-    // pozycja
-    noButton.style.left =
-        Math.random() * (box.width - noButton.offsetWidth) + "px";
-    noButton.style.top =
-        Math.random() * (box.height - noButton.offsetHeight) + "px";
-
-    // tekst (do ostatniego)
     if (step < texts.length - 1) {
         step++;
         noButton.textContent = texts[step];
     }
 
-    // zmniejszanie
     scale -= 0.12;
     if (scale < 0.6) scale = 0.6;
     noButton.style.transform = `scale(${scale})`;
 
-    // kolor
     const red = Math.min(255, 180 + step * 25);
     noButton.style.backgroundColor = `rgb(${red},170,170)`;
 
-    // trzęsienie
     noButton.classList.add("shake");
     setTimeout(() => noButton.classList.remove("shake"), 250);
+
+    if (navigator.vibrate) navigator.vibrate(100);
 }
 
-/* PC */
 noButton.addEventListener("mouseenter", moveNo);
-
-/* MOBILE */
 buttonsBox.addEventListener("touchstart", e => {
     if (e.target.id === "no") {
         moveNo();
@@ -189,8 +233,22 @@ yesButton.addEventListener("click", () => {
     document.getElementById("question").style.display = "none";
     document.getElementById("buttonsBox").style.display = "none";
 
-    document.getElementById("bigLove").style.display = "block";
-    document.getElementById("lovePhoto").style.display = "block";
+    bigLove.style.display = "block";
+    bigLove.classList.add("pulse");
+
+    lovePhotoContainer.style.display = "flex";
+    mainPhoto.style.display = "block";
+
+    // zdjęcia boczne
+    leftMeme.style.display = "block";
+    leftMeme.classList.add("left-animate");
+    rightMeme.style.display = "block";
+    rightMeme.classList.add("right-animate");
+
+    const audio = document.getElementById("loveSound");
+    if(audio) audio.play();
+
+    for(let i=0; i<50; i++) createConfetti();
 });
 
 /* ❤️ SERCA */
@@ -198,6 +256,10 @@ function createHeart() {
     const heart = document.createElement("div");
     heart.className = "heart";
     heart.innerText = "❤️";
+
+    const colors = ["#ff5c8a", "#e91e63", "#ff4081", "#f06292"];
+    heart.style.color = colors[Math.floor(Math.random() * colors.length)];
+
     heart.style.left = Math.random() * 100 + "vw";
     heart.style.fontSize = (18 + Math.random() * 20) + "px";
     heart.style.animationDuration = (3 + Math.random() * 4) + "s";
@@ -205,6 +267,26 @@ function createHeart() {
     setTimeout(() => heart.remove(), 7000);
 }
 setInterval(createHeart, 350);
+
+function createConfetti() {
+    const confetti = document.createElement("div");
+    confetti.style.position = "fixed";
+    confetti.style.width = "8px";
+    confetti.style.height = "8px";
+    confetti.style.backgroundColor = ["#ff5c8a","#e91e63","#f06292","#ff4081"][Math.floor(Math.random()*4)];
+    confetti.style.left = Math.random()*100 + "vw";
+    confetti.style.top = "-10px";
+    confetti.style.borderRadius = "50%";
+    confetti.style.zIndex = 3;
+    confetti.style.opacity = 0.8;
+    confetti.style.transition = "all 3s linear";
+    document.body.appendChild(confetti);
+    setTimeout(() => {
+        confetti.style.top = "110vh";
+        confetti.style.transform = `rotate(${Math.random()*360}deg)`;
+    }, 10);
+    setTimeout(() => confetti.remove(), 3100);
+}
 </script>
 
 </body>
